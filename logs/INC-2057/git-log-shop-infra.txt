@@ -1,0 +1,21 @@
+$ git log --oneline --stat -3 -- apps/reports-worker/
+
+9f3c2a1 (2026-10-30 20:15 UTC) quick fix: reports-worker auth (#482)
+ apps/reports-worker/configmap.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+4b81e07 (2026-10-22 11:02 UTC) reports-worker: nightly schedule 01:00 UTC (#471)
+ apps/reports-worker/cronjob.yaml | 2 +-
+
+c09d5f4 (2026-10-14 16:40 UTC) add reports-worker CronJob (#455)
+ apps/reports-worker/cronjob.yaml   | 38 ++++++
+ apps/reports-worker/configmap.yaml |  6 +
+ apps/reports-worker/sa.yaml        |  6 +
+
+$ git show 9f3c2a1 -- apps/reports-worker/configmap.yaml
++  AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
++  AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+GitHub secret scanning alert #31 (2026-10-30 20:52 UTC):
+  "Amazon AWS Access Key ID" detected in public fork github.com/<redacted-user>/shop-infra
+  at apps/reports-worker/configmap.yaml line 9

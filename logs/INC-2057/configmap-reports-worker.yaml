@@ -1,0 +1,14 @@
+# kubectl get configmap reports-worker -n shop -o yaml  (trimmed)
+# NOTE: these are AWS's documented example credentials, not real keys.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reports-worker
+  namespace: shop
+  annotations:
+    argocd.argoproj.io/tracking-id: shop:/ConfigMap:shop/reports-worker
+data:
+  REPORTS_BUCKET: shop-staging-reports
+  AWS_REGION: eu-west-1
+  AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+  AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY

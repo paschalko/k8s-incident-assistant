@@ -1,0 +1,64 @@
+[
+  {
+    "SchemaVersion": "2.0",
+    "Id": "8ec5f1a0b1c94e4b9f6a0d3e0b7a1c22",
+    "Type": "UnauthorizedAccess:IAMUser/MaliciousIPCaller.Custom",
+    "Severity": 8.0,
+    "Region": "eu-west-1",
+    "AccountId": "111122223333",
+    "CreatedAt": "2026-10-31T02:41:09Z",
+    "Title": "API GetCallerIdentity was invoked from an IP address on a custom threat list.",
+    "Resource": {
+      "ResourceType": "AccessKey",
+      "AccessKeyDetails": {
+        "AccessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "UserName": "svc-reports-uploader",
+        "UserType": "IAMUser"
+      }
+    },
+    "Service": {
+      "Action": {
+        "ActionType": "AWS_API_CALL",
+        "AwsApiCallAction": {
+          "Api": "GetCallerIdentity",
+          "ServiceName": "sts.amazonaws.com",
+          "RemoteIpDetails": { "IpAddressV4": "203.0.113.77", "Country": { "CountryName": "Unknown" } }
+        }
+      },
+      "EventFirstSeen": "2026-10-31T02:39:51Z",
+      "EventLastSeen": "2026-10-31T02:41:02Z",
+      "Count": 3
+    }
+  },
+  {
+    "SchemaVersion": "2.0",
+    "Id": "4a7d2e9c55f04c1f8b3c6e1d9a0f7b33",
+    "Type": "Discovery:S3/AnomalousBehavior",
+    "Severity": 5.0,
+    "Region": "eu-west-1",
+    "AccountId": "111122223333",
+    "CreatedAt": "2026-10-31T02:46:30Z",
+    "Title": "An IAM entity invoked an S3 API in a suspicious way.",
+    "Resource": {
+      "ResourceType": "AccessKey",
+      "AccessKeyDetails": {
+        "AccessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "UserName": "svc-reports-uploader",
+        "UserType": "IAMUser"
+      }
+    },
+    "Service": {
+      "Action": {
+        "ActionType": "AWS_API_CALL",
+        "AwsApiCallAction": {
+          "Api": "ListBuckets",
+          "ServiceName": "s3.amazonaws.com",
+          "RemoteIpDetails": { "IpAddressV4": "203.0.113.77" }
+        }
+      },
+      "EventFirstSeen": "2026-10-31T02:42:18Z",
+      "EventLastSeen": "2026-10-31T02:46:01Z",
+      "Count": 41
+    }
+  }
+]
