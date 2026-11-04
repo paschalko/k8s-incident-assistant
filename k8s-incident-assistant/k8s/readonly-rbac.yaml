@@ -1,0 +1,56 @@
+# Phase 2: a read-only identity for the assistant on a NON-PRODUCTION cluster
+# (e.g. a local kind cluster). This, not the AI prompt, is your real security boundary.
+#
+# Apply with YOUR admin credentials on the test cluster (a human does this, not Claude):
+#   kubectl apply -f k8s/readonly-rbac.yaml
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: incident-assistant
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: incident-assistant-readonly
+rules:
+  # Workloads and their status. NOTE: "secrets" is deliberately absent.
+  - apiGroups: [""]
+    resources: [pods, pods/log, services, endpoints, events, configmaps,
+                namespaces, nodes, persistentvolumeclaims, resourcequotas, limitranges]
+    verbs: [get, list, watch]
+  - apiGroups: [apps]
+    resources: [deployments, replicasets, statefulsets, daemonsets]
+    verbs: [get, list, watch]
+  - apiGroups: [batch]
+    resources: [jobs, cronjobs]
+    verbs: [get, list, watch]
+  - apiGroups: [autoscaling]
+    resources: [horizontalpodautoscalers]
+    verbs: [get, list, watch]
+  - apiGroups: [networking.k8s.io]
+    resources: [ingresses, networkpolicies]
+    verbs: [get, list, watch]
+  - apiGroups: [events.k8s.io]
+    resources: [events]
+    verbs: [get, list, watch]
+  - apiGroups: [metrics.k8s.io]
+    resources: [pods, nodes]
+    verbs: [get, list]
+  # Intentionally NOT granted: secrets, pods/exec, pods/attach, pods/portforward,
+  # create/update/patch/delete on anything.
+  # Caveat: configmaps sometimes hold sensitive values; drop them if yours do.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: incident-assistant-readonly
+subjects:
+  - kind: ServiceAccount
+    name: incident-assistant
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: incident-assistant-readonly
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,11 @@
+LAST SEEN               TYPE      REASON              OBJECT                                  MESSAGE
+2026-10-30T13:58:41Z    Normal    ScalingReplicaSet   deployment/checkout-api                 Scaled up replica set checkout-api-7d9f8b6c5 to 1
+2026-10-30T13:58:47Z    Normal    Pulled              pod/checkout-api-7d9f8b6c5-x2k4p        Successfully pulled image "registry.example.com/shop/checkout-api:v2.14.0" in 3.1s
+2026-10-30T13:59:20Z    Normal    ScalingReplicaSet   deployment/checkout-api                 Scaled down replica set checkout-api-5c6b7d8e9 to 0 from 1
+2026-10-30T14:02:31Z    Warning   OOMKilling          node/ip-10-20-3-41                      Memory cgroup out of memory: Killed process 23119 (checkout-api) total-vm:1489212kB, anon-rss:523904kB
+2026-10-30T14:05:47Z    Warning   OOMKilling          node/ip-10-20-1-17                      Memory cgroup out of memory: Killed process 18842 (checkout-api) total-vm:1490128kB, anon-rss:524011kB
+2026-10-30T14:11:53Z    Warning   OOMKilling          node/ip-10-20-3-41                      Memory cgroup out of memory: Killed process 24410 (checkout-api) total-vm:1491004kB, anon-rss:524210kB
+2026-10-30T14:12:05Z    Warning   BackOff             pod/checkout-api-7d9f8b6c5-x2k4p        Back-off restarting failed container checkout-api
+2026-10-30T14:12:40Z    Warning   Unhealthy           pod/checkout-api-7d9f8b6c5-m8q2z        Readiness probe failed: Get "http://10.20.1.77:8080/ready": context deadline exceeded
+2026-10-30T14:15:10Z    Normal    Pulled              pod/payment-gateway-6f5d4c3b2-k9w1t     Container image "registry.example.com/shop/payment-gateway:v1.8.3" already present on machine
+2026-10-30T14:18:44Z    Warning   BackOff             pod/checkout-api-7d9f8b6c5-r4t7n        Back-off restarting failed container checkout-api

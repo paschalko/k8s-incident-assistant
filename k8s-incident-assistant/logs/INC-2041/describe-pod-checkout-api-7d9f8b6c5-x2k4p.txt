@@ -1,0 +1,53 @@
+Name:             checkout-api-7d9f8b6c5-x2k4p
+Namespace:        shop
+Priority:         0
+Service Account:  checkout-api
+Node:             ip-10-20-3-41.eu-west-1.compute.internal/10.20.3.41
+Start Time:       Fri, 30 Oct 2026 13:58:47 +0000
+Labels:           app=checkout-api
+                  pod-template-hash=7d9f8b6c5
+                  version=v2.14.0
+Status:           Running
+IP:               10.20.3.118
+Controlled By:    ReplicaSet/checkout-api-7d9f8b6c5
+Containers:
+  checkout-api:
+    Container ID:   containerd://9b1e2c0f4a7d
+    Image:          registry.example.com/shop/checkout-api:v2.14.0
+    Port:           8080/TCP
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       OOMKilled
+      Exit Code:    137
+      Started:      Fri, 30 Oct 2026 14:09:02 +0000
+      Finished:     Fri, 30 Oct 2026 14:11:53 +0000
+    Ready:          False
+    Restart Count:  8
+    Limits:
+      cpu:     1
+      memory:  512Mi
+    Requests:
+      cpu:      250m
+      memory:   256Mi
+    Liveness:   http-get http://:8080/healthz delay=10s timeout=2s period=10s #success=1 #failure=3
+    Readiness:  http-get http://:8080/ready delay=5s timeout=2s period=5s #success=1 #failure=3
+    Environment:
+      APP_ENV:          staging
+      CACHE_MAX_ITEMS:  500000
+      CACHE_TTL:        30m
+      DATABASE_URL:     <set to the key 'url' in secret 'checkout-db'>  Optional: false
+      PAYMENT_GATEWAY_URL: http://payment-gateway.shop.svc:8443
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+QoS Class:          Burstable
+Events:
+  Type     Reason     Age                  From     Message
+  ----     ------     ----                 ----     -------
+  Normal   Pulled     12m (x9 over 23m)    kubelet  Container image "registry.example.com/shop/checkout-api:v2.14.0" already present on machine
+  Normal   Started    12m (x9 over 23m)    kubelet  Started container checkout-api
+  Warning  BackOff    2m (x31 over 20m)    kubelet  Back-off restarting failed container checkout-api in pod checkout-api-7d9f8b6c5-x2k4p

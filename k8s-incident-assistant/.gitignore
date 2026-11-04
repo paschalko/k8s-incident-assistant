@@ -1,0 +1,7 @@
+.claude/settings.local.json
+.claude/audit.log
+k8s/assistant.kubeconfig
+*.kubeconfig
+.env*
+reports/*
+!reports/.gitkeep

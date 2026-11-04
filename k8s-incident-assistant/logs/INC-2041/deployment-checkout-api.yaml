@@ -1,0 +1,65 @@
+# kubectl get deployment checkout-api -n shop -o yaml  (trimmed)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-api
+  namespace: shop
+  annotations:
+    argocd.argoproj.io/tracking-id: shop:apps/Deployment:shop/checkout-api
+    deployment.kubernetes.io/revision: "41"
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: checkout-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: checkout-api
+        version: v2.14.0
+    spec:
+      serviceAccountName: checkout-api
+      containers:
+        - name: checkout-api
+          image: registry.example.com/shop/checkout-api:v2.14.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_ENV
+              value: staging
+            - name: CACHE_MAX_ITEMS
+              value: "500000"
+            - name: CACHE_TTL
+              value: 30m
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: checkout-db
+                  key: url
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet: { path: /ready, port: 8080 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+status:
+  replicas: 3
+  readyReplicas: 0
+  unavailableReplicas: 3
