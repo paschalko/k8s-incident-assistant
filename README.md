@@ -58,6 +58,7 @@ incidents/         incident reports (input)
 logs/<ID>/         evidence: pod logs, kubectl output, CloudTrail, GuardDuty, git history
 runbooks/          approved runbooks incl. leaked-credentials.md
 tools/             log_summary.py – pre-filters and redacts evidence
+api/               FastAPI service over the same analysis (Dockerfile, tests)
 evals/             answer keys for scoring the assistant
 tests/             guard and log-summary tests (run in CI)
 k8s/               read-only RBAC + kubeconfig generator for a non-prod cluster
@@ -80,6 +81,45 @@ The report is written to `reports/`. Compare it with `evals/<ID>.expected.md`.
 **Against a real cluster (non-production only):** apply `k8s/readonly-rbac.yaml` with admin rights,
 run `k8s/make-readonly-kubeconfig.sh` to mint an 8-hour read-only kubeconfig, then start with
 `KUBECONFIG=$PWD/k8s/assistant.kubeconfig claude`. Check `kubectl auth can-i delete pods -A` returns `no`.
+
+## HTTP API (FastAPI)
+
+The same read-only analysis is also available as an API, so dashboards, chat bots or other tools can use it
+without running Claude Code. It never changes anything; it returns findings for a person to act on.
+
+```bash
+pip install -r api/requirements.txt
+TRIAGE_API_KEYS="viewer:viewer-dev-key,analyst:analyst-dev-key" uvicorn api.main:app --reload
+# interactive docs: http://127.0.0.1:8000/docs
+curl -H "X-API-Key: viewer-dev-key" localhost:8000/v1/incidents/INC-2041/triage
+```
+
+| Endpoint | Role | What it does |
+|---|---|---|
+| `GET /health` | none | Liveness check |
+| `GET /v1/incidents?page=&page_size=&type=&severity=` | viewer | Paginated incidents, filterable by type and severity |
+| `GET /v1/incidents/{id}` | viewer | Incident report (redacted) and its evidence files |
+| `GET /v1/incidents/{id}/evidence/{file}` | viewer | Redacted summary of one evidence file: signals, levels, injection lines |
+| `GET /v1/incidents/{id}/triage` | viewer | Incident type, ranked runbook suggestions and prompt-injection warnings |
+| `POST /v1/triage` | analyst | Triage evidence you send in (up to 10 files, 200k characters each). Nothing is stored |
+| `GET /v1/runbooks` | viewer | The approved runbook list |
+
+How it's built:
+
+- **Access:** API keys with `viewer` and `analyst` roles, read from `TRIAGE_API_KEYS` (inject from a secrets
+  manager in production). Keys are compared as SHA-256 digests in constant time. No keys configured means
+  every protected endpoint refuses.
+- **Validation:** Pydantic models check every request: incident IDs, safe file names, size and count limits.
+  Evidence files are only opened if they're listed in the incident's folder, so `../` paths can't escape.
+- **Errors:** one JSON shape for every error (`code`, `message`, field-level `details`, `request_id`).
+- **Secrets:** every response goes through the same `redact()` as the agent; tests check that no fixture
+  secret ever appears in a response.
+- **Performance:** file analysis is cached by path and modification time; CPU work runs off the event loop.
+- **Observability:** each request gets an `X-Request-ID` (or keeps the caller's) and one JSON log line with
+  status and duration.
+- **Versioning:** routes live under `/v1`, so breaking changes can ship as `/v2` alongside.
+- **Delivery:** `api/Dockerfile` builds a small non-root image. CI runs the guard, summariser and 18 API tests,
+  then builds the image and smoke-tests it.
 
 ## Design decisions
 

@@ -1,0 +1,8 @@
+.git
+.claude
+reports
+k8s
+*.kubeconfig
+.env*
+__pycache__
+.pytest_cache
